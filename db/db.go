@@ -17,7 +17,7 @@ func ConnectDatabase() {
 		port     = 5432
 		user     = "postgres"
 		password = "root"
-		dbname   = "postgres"
+		dbname   = "MenthalHealthCare"
 	)
 
 	psqlInfo := fmt.Sprintf(
@@ -37,4 +37,23 @@ func ConnectDatabase() {
 	}
 
 	fmt.Println("✅ Connected to PostgreSQL database!")
+}
+
+func CreateUsersTable() error {
+    createTableSQL := `
+    CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
+        username VARCHAR(50) UNIQUE NOT NULL,
+        email VARCHAR(100) UNIQUE NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );`
+
+    _, err := DB.Exec(createTableSQL)
+    return err
+}
+
+func InsertUser(username, email string) error {
+    insertSQL := `INSERT INTO users (username, email) VALUES ($1, $2)`
+    _, err := DB.Exec(insertSQL, username, email)
+    return err
 }
