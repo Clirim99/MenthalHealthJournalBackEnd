@@ -1,21 +1,23 @@
-package main
+// db/db.go
+package db
 
 import (
 	"database/sql"
 	"fmt"
 	"log"
 
-	//_ "github.com/lib/pq"
+	_ "github.com/lib/pq"
 )
 
-func main() {
-	// Update these with your PostgreSQL credentials
+var DB *sql.DB // Global DB instance
+
+func ConnectDatabase() {
 	const (
 		host     = "localhost"
 		port     = 5432
-		user     = "your_db_user"
-		password = "your_db_password"
-		dbname   = "your_db_name"
+		user     = "postgres"
+		password = "root"
+		dbname   = "postgres"
 	)
 
 	psqlInfo := fmt.Sprintf(
@@ -23,18 +25,16 @@ func main() {
 		host, port, user, password, dbname,
 	)
 
-	// Open connection
-	db, err := sql.Open("postgres", psqlInfo)
+	var err error
+	DB, err = sql.Open("postgres", psqlInfo)
 	if err != nil {
 		log.Fatalf("Error opening database: %v", err)
 	}
-	defer db.Close()
 
-	// Test the connection
-	err = db.Ping()
+	err = DB.Ping()
 	if err != nil {
 		log.Fatalf("Error connecting to the database: %v", err)
 	}
 
-	fmt.Println("Successfully connected to PostgreSQL!")
+	fmt.Println("✅ Connected to PostgreSQL database!")
 }
