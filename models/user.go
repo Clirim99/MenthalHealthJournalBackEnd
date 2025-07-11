@@ -7,7 +7,7 @@ import (
 )
 
 type User struct {
-	ID        int       `json:"id"`
+	ID        string       `json:"id"`
 	FirstName string    `json:"first_name"`
 	LastName  string    `json:"last_name"`
 	Username  string    `json:"username"`
@@ -19,7 +19,7 @@ type User struct {
 func CreateUsersTable(db *sql.DB) error {
 	query := `
 	CREATE TABLE IF NOT EXISTS users (
-		id SERIAL PRIMARY KEY,
+		id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 		first_name VARCHAR(50) NOT NULL,
 		last_name VARCHAR(50) NOT NULL,
 		username VARCHAR(50) UNIQUE NOT NULL,
