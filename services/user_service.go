@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 	"strings"
-//	"errors"
+	"errors"
 
 
 	//"menthalhealthjournal/db"
@@ -74,7 +74,7 @@ func LoginUser(c *gin.Context) {
 
 	email := strings.ToLower(loginData.Email)
 
-	user, err := repositories.AuthenticateUser(email, loginData.Password)
+	user, err := AuthenticateUser(email, loginData.Password)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 		return
@@ -90,4 +90,19 @@ func LoginUser(c *gin.Context) {
 			"username": user.Username,
 		},
 	})
+}
+
+func AuthenticateUser(email, password string) (models.User, error) {
+	user, err := repositories.GetUserByEmailForLogin(email)
+	if err != nil {
+		return user, errors.New("invalid email or password")
+	}
+
+	// Compare password with hash
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+	if err != nil {
+		return user, errors.New("invalid email or password")
+	}
+
+	return user, nil
 }

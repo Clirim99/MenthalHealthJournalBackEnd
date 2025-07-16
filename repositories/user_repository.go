@@ -5,12 +5,14 @@ import (
 	"fmt"
 	"menthalhealthjournal/db"
 	"menthalhealthjournal/models"
-//	"menthalhealthjournal/services"
+
+	//	"menthalhealthjournal/services"
+	"errors"
 	"log"
 	"net/http"
+
 	"github.com/gin-gonic/gin"
-	"errors"
-	"golang.org/x/crypto/bcrypt"
+	//"golang.org/x/crypto/bcrypt"
 )
 
 func GetUserByEmail(email string) (models.User, error) {
@@ -52,20 +54,20 @@ func CreateUser(c *gin.Context, user models.User) {
 	c.JSON(http.StatusCreated, user)
 }
 
-func AuthenticateUser(email, password string) (models.User, error) {
-	user, err := GetUserByEmailForLogin(email)
-	if err != nil {
-		return user, errors.New("invalid email ")
-	}
+// func AuthenticateUser(email, password string) (models.User, error) {
+// 	user, err := GetUserByEmailForLogin(email)
+// 	if err != nil {
+// 		return user, errors.New("invalid email or password")
+// 	}
 
-	// Compare password with hash
-	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
-	if err != nil {
-		return user, errors.New("invalid  or password")
-	}
+// 	// Compare password with hash
+// 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+// 	if err != nil {
+// 		return user, errors.New("invalid email or password")
+// 	}
 
-	return user, nil
-}
+// 	return user, nil
+// }
 
 func GetUserByEmailForLogin(email string) (models.User, error) {
 	var user models.User
