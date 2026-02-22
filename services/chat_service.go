@@ -142,8 +142,8 @@ func ChatWithJournal(c *gin.Context) {
 }
 
 func GetChatHistory(c *gin.Context) {
-	sessionID := c.Param("session_id")
-
+	sessionID := c.Param("id")
+	
 	messages, err := repositories.GetChatMessagesBySessionID(sessionID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

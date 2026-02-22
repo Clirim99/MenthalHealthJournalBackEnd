@@ -6,10 +6,16 @@ import (
 	"menthalhealthjournal/models"
 	"menthalhealthjournal/router"
 	"menthalhealthjournal/services"
+//	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 )
 
 func main() {
 	// Initialize OpenAI client
+	err := godotenv.Load()
+	if err != nil {
+		log.Println("Warning: Error loading .env file")
+	}
 	services.InitOpenAIClient()
 	log.Println("✅ OpenAI client initialized")
 

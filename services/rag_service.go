@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"menthalhealthjournal/models"
 	"menthalhealthjournal/repositories"
-	"time"
+	//"time"
 )
 
 // GetAnswerFromJournal implements the RAG pipeline for chatting with the journal

@@ -7,6 +7,7 @@ import (
 	"menthalhealthjournal/repositories"
 
 	"github.com/gin-gonic/gin"
+	"github.com/pgvector/pgvector-go" // <--- ADD THIS LINE
 )
 
 func CreateEntry(c *gin.Context) {
@@ -46,7 +47,7 @@ func CreateEntry(c *gin.Context) {
 	}
 
 	// Don't expose embedding in response
-	createdEntry.Embedding = nil
+	createdEntry.Embedding = pgvector.Vector{}	
 	c.JSON(http.StatusCreated, createdEntry)
 }
 
@@ -60,7 +61,7 @@ func GetEntry(c *gin.Context) {
 	}
 
 	// Don't expose embedding in response
-	entry.Embedding = nil
+	entry.Embedding = pgvector.Vector{}
 	c.JSON(http.StatusOK, entry)
 }
 
@@ -76,7 +77,7 @@ func GetEntriesByUser(c *gin.Context) {
 
 	// Remove embeddings from response
 	for i := range entries {
-		entries[i].Embedding = nil
+		entries[i].Embedding = pgvector.Vector{}
 	}
 
 	c.JSON(http.StatusOK, entries)
@@ -123,7 +124,7 @@ func UpdateEntry(c *gin.Context) {
 	}
 
 	// Don't expose embedding in response
-	updatedEntry.Embedding = nil
+	updatedEntry.Embedding = pgvector.Vector{}
 	c.JSON(http.StatusOK, updatedEntry)
 }
 

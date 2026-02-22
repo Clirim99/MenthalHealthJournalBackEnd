@@ -20,6 +20,7 @@ func InitOpenAIClient() {
 }
 
 // GetEmbedding converts text to a vector embedding using OpenAI's text-embedding-3-small model
+// GetEmbedding converts text to a vector embedding using OpenAI's text-embedding-3-small model
 func GetEmbedding(text string) (pgvector.Vector, error) {
 	if OpenAIClient == nil {
 		InitOpenAIClient()
@@ -33,20 +34,16 @@ func GetEmbedding(text string) (pgvector.Vector, error) {
 
 	resp, err := OpenAIClient.CreateEmbeddings(ctx, req)
 	if err != nil {
-		return nil, fmt.Errorf("error creating embedding: %v", err)
+		return pgvector.Vector{}, fmt.Errorf("error creating embedding: %v", err) // Changed nil to pgvector.Vector{}
 	}
 
 	if len(resp.Data) == 0 {
-		return nil, fmt.Errorf("no embedding data returned")
+		return pgvector.Vector{}, fmt.Errorf("no embedding data returned") // Changed nil to pgvector.Vector{}
 	}
 
-	// Convert []float32 to []float64 for pgvector
-	embedding := make([]float64, len(resp.Data[0].Embedding))
-	for i, v := range resp.Data[0].Embedding {
-		embedding[i] = float64(v)
-	}
-
-	return pgvector.NewVector(embedding), nil
+	// pgvector.NewVector expects []float32, and OpenAI already returns []float32!
+	// No conversion loop is needed. Just pass it directly.
+	return pgvector.NewVector(resp.Data[0].Embedding), nil
 }
 
 // GetChatCompletion sends a message to GPT-4o and returns the response

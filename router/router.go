@@ -28,7 +28,7 @@ func SetupRouter() *gin.Engine {
 	r.POST("/chat/sessions", controllers.CreateChatSession)
 	r.GET("/chat/sessions/:id", controllers.GetChatSession)
 	r.GET("/users/:user_id/chat/sessions", controllers.GetChatSessionsByUser)
-	r.GET("/chat/sessions/:session_id/messages", controllers.GetChatHistory)
+	r.GET("/chat/sessions/:id/messages", controllers.GetChatHistory)
 	r.DELETE("/chat/sessions/:id", controllers.DeleteChatSession)
 
 	return r
