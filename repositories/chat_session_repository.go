@@ -36,16 +36,18 @@ func CreateChatSession(session models.ChatSession) (models.ChatSession, error) {
 }
 
 func GetChatSessionByID(id string) (models.ChatSession, error) {
-	query := `SELECT id, user_id, context_type, entry_id, created_at, updated_at 
+	query := `SELECT id, user_id, context_type, entry_id, session_name, created_at, updated_at 
 			  FROM chat_sessions WHERE id = $1`
 
 	var session models.ChatSession
 	var entryID sql.NullString
+	var sessionName sql.NullString
 	err := db.DB.QueryRow(query, id).Scan(
 		&session.ID,
 		&session.UserID,
 		&session.ContextType,
 		&entryID,
+		&sessionName,
 		&session.CreatedAt,
 		&session.UpdatedAt,
 	)
@@ -60,12 +62,16 @@ func GetChatSessionByID(id string) (models.ChatSession, error) {
 	if entryID.Valid {
 		session.EntryID = &entryID.String
 	}
+	if sessionName.Valid {
+		s := sessionName.String
+		session.SessionName = &s
+	}
 
 	return session, nil
 }
 
 func GetChatSessionsByUserID(userID string) ([]models.ChatSession, error) {
-	query := `SELECT id, user_id, context_type, entry_id, created_at, updated_at 
+	query := `SELECT id, user_id, context_type, entry_id, session_name, created_at, updated_at 
 			  FROM chat_sessions WHERE user_id = $1 ORDER BY created_at DESC`
 
 	rows, err := db.DB.Query(query, userID)
@@ -78,11 +84,13 @@ func GetChatSessionsByUserID(userID string) ([]models.ChatSession, error) {
 	for rows.Next() {
 		var session models.ChatSession
 		var entryID sql.NullString
+		var sessionName sql.NullString
 		err := rows.Scan(
 			&session.ID,
 			&session.UserID,
 			&session.ContextType,
 			&entryID,
+			&sessionName,
 			&session.CreatedAt,
 			&session.UpdatedAt,
 		)
@@ -91,6 +99,10 @@ func GetChatSessionsByUserID(userID string) ([]models.ChatSession, error) {
 		}
 		if entryID.Valid {
 			session.EntryID = &entryID.String
+		}
+		if sessionName.Valid {
+			s := sessionName.String
+			session.SessionName = &s
 		}
 		sessions = append(sessions, session)
 	}
@@ -126,6 +138,19 @@ func UpdateChatSession(id string, session models.ChatSession) error {
 		return fmt.Errorf("chat session not found")
 	}
 
+	return nil
+}
+
+// UpdateChatSessionNameIfUnset sets session_name only when it is currently NULL (first automatic title).
+func UpdateChatSessionNameIfUnset(sessionID, name string) error {
+	_, err := db.DB.Exec(`
+		UPDATE chat_sessions
+		SET session_name = $2, updated_at = CURRENT_TIMESTAMP
+		WHERE id = $1 AND session_name IS NULL`,
+		sessionID, name)
+	if err != nil {
+		return fmt.Errorf("error updating chat session name: %v", err)
+	}
 	return nil
 }
 

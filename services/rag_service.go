@@ -71,6 +71,8 @@ func GetAnswerFromJournalWithSession(sessionID, userMessage string) (string, err
 		return "", fmt.Errorf("error saving user message: %v", err)
 	}
 
+	MaybeSetSessionNameOnFirstUserMessage(session, userMessage)
+
 	var response string
 
 	// Handle different context types

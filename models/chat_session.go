@@ -18,6 +18,7 @@ type ChatSession struct {
 	UserID      string      `json:"user_id"`
 	ContextType ContextType `json:"context_type"`
 	EntryID     *string     `json:"entry_id,omitempty"` // Only used if context_type is 'single_entry'
+	SessionName *string     `json:"session_name,omitempty"`
 	CreatedAt   time.Time   `json:"created_at"`
 	UpdatedAt   time.Time   `json:"updated_at"`
 }
@@ -41,6 +42,7 @@ func CreateChatSessionsTable(db *sql.DB) error {
 		user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
 		context_type context_type NOT NULL DEFAULT 'global',
 		entry_id UUID REFERENCES entries(id) ON DELETE SET NULL,
+		session_name VARCHAR(100),
 		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 		updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 	);`
@@ -48,6 +50,11 @@ func CreateChatSessionsTable(db *sql.DB) error {
 	_, err = db.Exec(query)
 	if err != nil {
 		return fmt.Errorf("could not create chat_sessions table: %v", err)
+	}
+
+	_, err = db.Exec(`ALTER TABLE chat_sessions ADD COLUMN IF NOT EXISTS session_name VARCHAR(100)`)
+	if err != nil {
+		return fmt.Errorf("could not add session_name to chat_sessions: %v", err)
 	}
 
 	// Create indexes

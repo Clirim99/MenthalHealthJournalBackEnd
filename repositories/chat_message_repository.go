@@ -28,6 +28,18 @@ func CreateChatMessage(message models.ChatMessage) (models.ChatMessage, error) {
 	return message, nil
 }
 
+func CountUserMessagesForSession(sessionID string) (int, error) {
+	var n int
+	err := db.DB.QueryRow(
+		`SELECT COUNT(*) FROM chat_messages WHERE session_id = $1 AND role = 'user'`,
+		sessionID,
+	).Scan(&n)
+	if err != nil {
+		return 0, fmt.Errorf("error counting user messages: %v", err)
+	}
+	return n, nil
+}
+
 func GetChatMessagesBySessionID(sessionID string) ([]models.ChatMessage, error) {
 	query := `SELECT id, session_id, role, content, created_at 
 			  FROM chat_messages WHERE session_id = $1 ORDER BY created_at ASC`

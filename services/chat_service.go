@@ -124,7 +124,11 @@ func ChatWithJournal(c *gin.Context) {
 				Role:      models.MessageRoleUser,
 				Content:   req.Message,
 			}
-			repositories.CreateChatMessage(userMsg)
+			if _, err := repositories.CreateChatMessage(userMsg); err != nil {
+				log.Println("Error saving user message:", err)
+			} else {
+				MaybeSetSessionNameOnFirstUserMessage(createdSession, req.Message)
+			}
 
 			assistantMsg := models.ChatMessage{
 				SessionID: createdSession.ID,

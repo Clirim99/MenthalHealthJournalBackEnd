@@ -80,3 +80,38 @@ func GetChatCompletion(systemPrompt, userMessage string) (string, error) {
 
 	return resp.Choices[0].Message.Content, nil
 }
+
+// GetChatSessionTitleLLM generates a short session title using the same model as chat (GPT-4o).
+func GetChatSessionTitleLLM(firstUserMessage string) (string, error) {
+	if OpenAIClient == nil {
+		InitOpenAIClient()
+	}
+
+	ctx := context.Background()
+	req := openai.ChatCompletionRequest{
+		Model: openai.GPT4o,
+		Messages: []openai.ChatCompletionMessage{
+			{
+				Role: openai.ChatMessageRoleSystem,
+				Content: `You write short chat thread titles for a mental health journaling app. Given the user's first message, reply with ONLY a concise title (maximum 100 characters), no quotation marks, no prefix or explanation. Capture the main topic or emotional theme.`,
+			},
+			{
+				Role:    openai.ChatMessageRoleUser,
+				Content: firstUserMessage,
+			},
+		},
+		Temperature: 0.4,
+		MaxTokens:   80,
+	}
+
+	resp, err := OpenAIClient.CreateChatCompletion(ctx, req)
+	if err != nil {
+		return "", fmt.Errorf("error creating chat completion: %v", err)
+	}
+
+	if len(resp.Choices) == 0 {
+		return "", fmt.Errorf("no choices returned from OpenAI")
+	}
+
+	return resp.Choices[0].Message.Content, nil
+}

@@ -53,6 +53,7 @@ CREATE TABLE IF NOT EXISTS chat_sessions (
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     context_type context_type NOT NULL DEFAULT 'global',
     entry_id UUID REFERENCES entries(id) ON DELETE SET NULL, -- Only used if context_type is 'single_entry'
+    session_name VARCHAR(100),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
